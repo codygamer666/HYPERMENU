@@ -1,7 +1,6 @@
-# Easy-GPU-P-GUI
-A menu version of the original Easy-GPU-PV project
+Fork Of The Original Easy-GPU-PV, With a menu!
 
-## Intructions:
-1. Clone this repo
-2. Put the win iso in the iso folder (named: WIN.iso)
-3. Run menu.ps1 and select the desired option
+Guide:
+
+1. Drop The Win10/11 ISO in the iso folder and rename it WIN.iso
+2. Run Menu.exe And Follow the options
