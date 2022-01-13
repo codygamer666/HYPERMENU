@@ -8,3 +8,5 @@ Guide:
 You can find the original Repo at: https://github.com/jamesstringerparsec/Easy-GPU-PV
 
 All Credits to @jamesstringerparsec
+
+![menu](https://user-images.githubusercontent.com/96527590/149374219-28d1398f-a3d2-4581-9cfe-eab1c2d9a651.JPG)
