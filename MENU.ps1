@@ -29,7 +29,7 @@ $host.UI.RawUI.BackgroundColor = "Black"
      Write-Host "3: Press '3' to Update GPU-P Drivers" -ForegroundColor Yellow
      Write-Host "4: Press '4' to Run The GPU-P PreChecks" -ForegroundColor Yellow
      Write-Host "5: Press '5' to Remove A GPU-P Adapter From A VM" -ForegroundColor Yellow
-     Write-Host "6: Press '6'  to Print A List Of Available GPUS In Your System" -ForegroundColor Yellow
+     Write-Host "6: Press '6' to Print A List Of Available GPUS In Your System" -ForegroundColor Yellow
 
      Write-Host "Q: Press 'Q' to quit." -ForegroundColor Red
  }
