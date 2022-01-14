@@ -11,6 +11,7 @@ Fork Of The Original Easy-GPU-PV, With a menu!
 2. Adds Gpu-p to an existing vm, including drivers
 3. Updates a gpu-p vm drivers
 4. Run the PreChecks script
+5. Remove gpu-p adapter from vm
 
 You can find the original Repo at: https://github.com/jamesstringerparsec/Easy-GPU-PV
 
