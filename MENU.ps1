@@ -26,6 +26,7 @@ if ((Test-Admin) -eq $false)  {
      Write-Host "1: Press '1' to Create A New VM"
      Write-Host "2: Press '2' to Add GPU-P To A VM"
      Write-Host "3: Press '3' to Update GPU-P Drivers"
+     Write-Host "4: Press '4' to Run The GPU-P PreChecks"
          
      Write-Host "Q: Press 'Q' to quit."
  }
@@ -58,6 +59,16 @@ $ScriptToRun= $PSScriptRoot+"\Update-VMGpuPartitionDriver.ps1"
 
 &$ScriptToRun
  } 
+  Function PreChecks 
+ {
+ "Running The Script"
+$PSScriptRoot 
+
+$ScriptToRun= $PSScriptRoot+"\PreChecks.ps1"
+
+&$ScriptToRun
+ } 
+
  #Main menu loop
  do {
      Show-Menu
@@ -67,6 +78,7 @@ $ScriptToRun= $PSScriptRoot+"\Update-VMGpuPartitionDriver.ps1"
          '1' {NewVM; break}
          '2' {ExistingVM; break}
          '3' {UpdateDrivers; break}
+         '4' {PreChecks; break}
          'q' {break} # do nothing
          default{
              Write-Host "You entered '$input'" -ForegroundColor Red
