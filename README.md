@@ -2,9 +2,9 @@
 Fork Of The Original Easy-GPU-PV, With a menu!
 
 ## Guide:
-
-1. Drop The Win10/11 ISO in the iso folder and rename it WIN.iso
-2. Run menu.ps1 and follow the options
+1. Download the menu from this link: https://github.com/codygamer666/EASY-GPU-P-MENU/releases 
+2. Drop the Win10/11 ISO in the iso folder and rename it WIN.iso
+3. Run menu.ps1 and follow the options
 
 ## Features:
 1. Creates a new vm with gpu-p, drivers and parsec using hyper-v
