@@ -1,17 +1,5 @@
-﻿$host.UI.RawUI.BackgroundColor = "Black"
-
-Function Get-DesktopPC
-{
- $isDesktop = $true
- if(Get-WmiObject -Class win32_systemenclosure | Where-Object { $_.chassistypes -eq 9 -or $_.chassistypes -eq 10 -or $_.chassistypes -eq 14})
-   {
-   Write-Warning "Computer is a laptop. Laptop dedicated GPU's that are partitioned and assigned to VM may not work with Parsec."
-   Write-Warning "Thunderbolt 3 or 4 dock based GPU's may work"
-   $isDesktop = $false }
- if (Get-WmiObject -Class win32_battery)
-   { $isDesktop = $false }
- $isDesktop
-}
+$host.UI.RawUI.BackgroundColor = "Black"
+Write-Host 'Gpu Print Script, For all kind of computers (even laptops)' -ForegroundColor Green
 
 Function Get-WindowsCompatibleOS {
 $build = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
@@ -19,7 +7,7 @@ if ($build.CurrentBuild -ge 19041 -and ($($build.editionid -like 'Professional*'
     Return $true
     }
 Else {
-    Write-Warning "Only Windows 10 20H1 or Windows 11 (Pro or Enterprise) is supported"
+    Write-Host "Only Windows 10 20H1 or Windows 11 (Pro or Enterprise) is supported" -ForegroundColor Red
     Return $false
     }
 }
@@ -30,14 +18,14 @@ if (Get-WindowsOptionalFeature -Online | Where-Object FeatureName -Like 'Microso
     Return $true
     }
 Else {
-    Write-Warning "You need to enable Virtualisation in your motherboard and then add the Hyper-V Windows Feature and reboot"
+    Write-Host "You need to enable Virtualisation in your motherboard and then add the Hyper-V Windows Feature and reboot" -ForegroundColor Red
     Return $false
     }
 }
 
 Function Get-WSLEnabled {
     if ((wsl -l -v)[2].length -gt 1 ) {
-        Write-Warning "WSL is Enabled. This may interferre with GPU-P and produce an error 43 in the VM"
+        Write-Host "WSL is Enabled. This may interferre with GPU-P and produce an error 43 in the VM" -ForegroundColor Red
         Return $true
         }
     Else {
@@ -53,10 +41,10 @@ Function Get-VMGpuPartitionAdapterFriendlyName {
         }
 }
 
-If ((Get-DesktopPC) -and  (Get-WindowsCompatibleOS) -and (Get-HyperVEnabled)) {
-"System Compatible"
-"Printing a list of compatible GPUs...May take a second"
-"Copy the name of the GPU you want to share..."
+If ((Get-WindowsCompatibleOS) -and (Get-HyperVEnabled)) {
+Write-Host "System Compatible" -ForegroundColor Green
+Write-Host "Printing a list of compatible GPUs...May take a second" -ForegroundColor Green
+Write-Host "Copy the name of the GPU you want to share..." -ForegroundColor Green
 Get-VMGpuPartitionAdapterFriendlyName
 Read-Host -Prompt "Press Enter to Exit"
 }

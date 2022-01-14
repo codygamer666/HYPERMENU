@@ -1,4 +1,6 @@
-﻿$VMName = Read-Host -Prompt 'Input your new VM Name'
+$host.UI.RawUI.BackgroundColor = "Black"
+
+$VMName = Read-Host -Prompt 'Input your new VM Name'
 $Username = Read-Host -Prompt 'Input the user name for the new vm'
 $Password = Read-Host -Prompt 'Imput your new password'
 $GPUName = Read-Host -Prompt 'Insert the name of the gpu (ONLY WIN11), type AUTO for WIN10 or if you are not sure'

@@ -1,4 +1,6 @@
-﻿$VMName = Read-Host -Prompt 'Input your VM name'
+$host.UI.RawUI.BackgroundColor = "Black"
+
+$VMName = Read-Host -Prompt 'Input your VM name'
 $GPUName = Read-Host -Prompt 'Input the gpu model or type AUTO for automatic installation'
 $Hostname = $ENV:Computername
 
@@ -18,7 +20,7 @@ If ($GPUName -eq "AUTO") {
     $DevicePathName = $PartitionableGPUList.Name | Select-Object -First 1
     $GPU = Get-PnpDevice | Where-Object {($_.DeviceID -like "*$($DevicePathName.Substring(8,16))*") -and ($_.Status -eq "OK")} | Select-Object -First 1
     $GPUName = $GPU.Friendlyname
-    $GPUServiceName = $GPU.Service 
+    $GPUServiceName = $GPU.Service
     }
 Else {
     $GPU = Get-PnpDevice | Where-Object {($_.Name -eq "$GPUName") -and ($_.Status -eq "OK")} | Select-Object -First 1
@@ -32,7 +34,7 @@ $Drivers = Get-WmiObject Win32_PNPSignedDriver | where {$_.DeviceName -eq "$GPUN
 
 New-Item -ItemType Directory -Path "$DriveLetter\windows\system32\HostDriverStore" -Force | Out-Null
 
-#copy directory associated with sys file 
+#copy directory associated with sys file
 $servicePath = (Get-WmiObject Win32_SystemDriver | Where-Object {$_.Name -eq "$GPUServiceName"}).Pathname
                 $ServiceDriverDir = $servicepath.split('\')[0..5] -join('\')
                 $ServicedriverDest = ("$driveletter" + "\" + $($servicepath.split('\')[1..5] -join('\'))).Replace("DriverStore","HostDriverStore")
@@ -72,7 +74,7 @@ foreach ($d in $drivers) {
                     New-Item -ItemType Directory -Path $Destination -Force | Out-Null
                     }
                 Copy-Item $path2 -Destination $Destination -Force
-                
+
             }
 
     }
@@ -90,7 +92,7 @@ If ($VM.state -eq "Running") {
 if ($VM.state -ne "Off"){
     "Attemping to shutdown VM..."
     Stop-VM -Name $VMName -Force
-    } 
+    }
 
 While ($VM.State -ne "Off") {
     Start-Sleep -s 3

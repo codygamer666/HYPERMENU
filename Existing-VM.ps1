@@ -1,6 +1,7 @@
-﻿Param (
+Param (
 [decimal]$GPUResourceAllocationPercentage = 100
 )
+$host.UI.RawUI.BackgroundColor = "Black"
 
 $VMName = Read-Host -Prompt 'Input your VM name'
 $GPUName = Read-Host -Prompt 'Input the gpu model or type AUTO for automatic installation'
@@ -22,7 +23,7 @@ If ($GPUName -eq "AUTO") {
     $DevicePathName = $PartitionableGPUList.Name | Select-Object -First 1
     $GPU = Get-PnpDevice | Where-Object {($_.DeviceID -like "*$($DevicePathName.Substring(8,16))*") -and ($_.Status -eq "OK")} | Select-Object -First 1
     $GPUName = $GPU.Friendlyname
-    $GPUServiceName = $GPU.Service 
+    $GPUServiceName = $GPU.Service
     }
 Else {
     $GPU = Get-PnpDevice | Where-Object {($_.Name -eq "$GPUName") -and ($_.Status -eq "OK")} | Select-Object -First 1
@@ -36,7 +37,7 @@ $Drivers = Get-WmiObject Win32_PNPSignedDriver | where {$_.DeviceName -eq "$GPUN
 
 New-Item -ItemType Directory -Path "$DriveLetter\windows\system32\HostDriverStore" -Force | Out-Null
 
-#copy directory associated with sys file 
+#copy directory associated with sys file
 $servicePath = (Get-WmiObject Win32_SystemDriver | Where-Object {$_.Name -eq "$GPUServiceName"}).Pathname
                 $ServiceDriverDir = $servicepath.split('\')[0..5] -join('\')
                 $ServicedriverDest = ("$driveletter" + "\" + $($servicepath.split('\')[1..5] -join('\'))).Replace("DriverStore","HostDriverStore")
@@ -76,7 +77,7 @@ foreach ($d in $drivers) {
                     New-Item -ItemType Directory -Path $Destination -Force | Out-Null
                     }
                 Copy-Item $path2 -Destination $Destination -Force
-                
+
             }
 
     }
@@ -94,7 +95,7 @@ If ($VM.state -eq "Running") {
 if ($VM.state -ne "Off"){
     "Attemping to shutdown VM..."
     Stop-VM -Name $VMName -Force
-    } 
+    }
 
 While ($VM.State -ne "Off") {
     Start-Sleep -s 3
@@ -110,9 +111,9 @@ Add-VMGPUPartitionAdapterFiles -hostname $Hostname -DriveLetter $DriveLetter -GP
 "Dismounting Drive..."
 Dismount-VHD -Path $VHD.Path
 
-function Assign-VMGPUPartitionAdapter 
-{  
-    $PartitionableGPUList = Get-WmiObject -Class "Msvm_PartitionableGpu" -ComputerName $env:COMPUTERNAME -Namespace "ROOT\virtualization\v2" 
+function Assign-VMGPUPartitionAdapter
+{
+    $PartitionableGPUList = Get-WmiObject -Class "Msvm_PartitionableGpu" -ComputerName $env:COMPUTERNAME -Namespace "ROOT\virtualization\v2"
     if ($GPUName -eq "AUTO") {
         $DevicePathName = $PartitionableGPUList.Name[0]
         Add-VMGpuPartitionAdapter -VMName $VMName

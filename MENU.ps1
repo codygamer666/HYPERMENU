@@ -1,4 +1,4 @@
-﻿param([switch]$Elevated)
+param([switch]$Elevated)
 
 function Test-Admin {
     $currentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -16,20 +16,22 @@ if ((Test-Admin) -eq $false)  {
 
 'running with full privileges'
 
+$host.UI.RawUI.BackgroundColor = "Black"
  # Main menu, allowing user selection
  function Show-Menu {
      param (
          [string]$Title = 'Easy GPU-P'
      )
      Clear-Host
-     Write-Host "================ $Title ================"
-     Write-Host "1: Press '1' to Create A New VM"
-     Write-Host "2: Press '2' to Add GPU-P To A VM"
-     Write-Host "3: Press '3' to Update GPU-P Drivers"
-     Write-Host "4: Press '4' to Run The GPU-P PreChecks"
-     Write-Host "5: Press '5' to Remove A GPU-P Adapter From A VM"
+     Write-Host "================ EASY-GPU-P-MENU ================" -ForegroundColor Green
+     Write-Host "1: Press '1' to Create A New VM" -ForegroundColor Yellow
+     Write-Host "2: Press '2' to Add GPU-P To A VM" -ForegroundColor Yellow
+     Write-Host "3: Press '3' to Update GPU-P Drivers" -ForegroundColor Yellow
+     Write-Host "4: Press '4' to Run The GPU-P PreChecks" -ForegroundColor Yellow
+     Write-Host "5: Press '5' to Remove A GPU-P Adapter From A VM" -ForegroundColor Yellow
+     Write-Host "6: Press '6  to Print A List Of Available GPUS In Your System'" -ForegroundColor Yellow
 
-     Write-Host "Q: Press 'Q' to quit."
+     Write-Host "Q: Press 'Q' to quit." -ForegroundColor Red
  }
 
  #Functions go here
@@ -78,6 +80,15 @@ $ScriptToRun= $PSScriptRoot+"\Remove-GPU-P.ps1"
 
 &$ScriptToRun
  }
+  Function PrintGpu
+{
+"Running The Script"
+$PSScriptRoot
+
+$ScriptToRun= $PSScriptRoot+"\PrintGpu.ps1"
+
+&$ScriptToRun
+}
 
  #Main menu loop
  do {
@@ -90,10 +101,11 @@ $ScriptToRun= $PSScriptRoot+"\Remove-GPU-P.ps1"
          '3' {UpdateDrivers; break}
          '4' {PreChecks; break}
          '5' {RemoveGpu; break}
+         '6' {PrintGpu; break}
          'q' {break} # do nothing
          default{
              Write-Host "You entered '$input'" -ForegroundColor Red
              Write-Host "Please select one of the choices from the menu." -ForegroundColor Red}
      }
      stop-process -Id $PID
- } until ($input -eq 'q')
+  } until ($input -eq '')
