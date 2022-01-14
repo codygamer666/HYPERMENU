@@ -12,6 +12,7 @@ Fork Of The Original Easy-GPU-PV, With a menu!
 3. Updates a gpu-p vm drivers
 4. Run the PreChecks script
 5. Remove gpu-p adapter from vm
+6. Print A List Of Available GPUS In Your System (Even On Laptops Yea)
 
 You can find the original Repo at: https://github.com/jamesstringerparsec/Easy-GPU-PV
 
