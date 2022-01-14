@@ -10,6 +10,7 @@ Fork Of The Original Easy-GPU-PV, With a menu!
 1. Creates a new vm with gpu-p, drivers and parsec using hyper-v
 2. Adds Gpu-p to an existing vm, including drivers
 3. Updates a gpu-p vm drivers
+4. Run the PreChecks script
 
 You can find the original Repo at: https://github.com/jamesstringerparsec/Easy-GPU-PV
 
