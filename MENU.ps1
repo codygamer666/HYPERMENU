@@ -15,7 +15,7 @@ if ((Test-Admin) -eq $false)  {
 }
 
 'running with full privileges'
- 
+
  # Main menu, allowing user selection
  function Show-Menu {
      param (
@@ -28,56 +28,56 @@ if ((Test-Admin) -eq $false)  {
      Write-Host "3: Press '3' to Update GPU-P Drivers"
      Write-Host "4: Press '4' to Run The GPU-P PreChecks"
      Write-Host "5: Press '5' to Remove A GPU-P Adapter From A VM"
-         
+
      Write-Host "Q: Press 'Q' to quit."
  }
-       
+
  #Functions go here
- Function NewVM 
+ Function NewVM
  {
  write-host "Running The Script"
-$PSScriptRoot 
+$PSScriptRoot
 
 $ScriptToRun= $PSScriptRoot+"\New-VM.ps1"
 
 &$ScriptToRun
  }
- Function ExistingVM 
+ Function ExistingVM
  {
  "Running The Script"
-$PSScriptRoot 
+$PSScriptRoot
 
 $ScriptToRun= $PSScriptRoot+"\Existing-VM.ps1"
 
 &$ScriptToRun
  }
- Function UpdateDrivers 
+ Function UpdateDrivers
  {
  "Running The Script"
-$PSScriptRoot 
+$PSScriptRoot
 
 $ScriptToRun= $PSScriptRoot+"\Update-VMGpuPartitionDriver.ps1"
 
 &$ScriptToRun
- } 
-  Function PreChecks 
+ }
+  Function PreChecks
  {
  "Running The Script"
-$PSScriptRoot 
+$PSScriptRoot
 
 $ScriptToRun= $PSScriptRoot+"\PreChecks.ps1"
 
 &$ScriptToRun
- } 
-   Function RemoveGpu 
+ }
+   Function RemoveGpu
  {
  "Running The Script"
-$PSScriptRoot 
+$PSScriptRoot
 
 $ScriptToRun= $PSScriptRoot+"\Remove-GPU-P.ps1"
 
 &$ScriptToRun
- } 
+ }
 
  #Main menu loop
  do {
@@ -95,5 +95,5 @@ $ScriptToRun= $PSScriptRoot+"\Remove-GPU-P.ps1"
              Write-Host "You entered '$input'" -ForegroundColor Red
              Write-Host "Please select one of the choices from the menu." -ForegroundColor Red}
      }
-     Pause
+     stop-process -Id $PID
  } until ($input -eq 'q')
