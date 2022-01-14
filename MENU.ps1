@@ -1,4 +1,4 @@
-param([switch]$Elevated)
+﻿param([switch]$Elevated)
 
 function Test-Admin {
     $currentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -27,6 +27,7 @@ if ((Test-Admin) -eq $false)  {
      Write-Host "2: Press '2' to Add GPU-P To A VM"
      Write-Host "3: Press '3' to Update GPU-P Drivers"
      Write-Host "4: Press '4' to Run The GPU-P PreChecks"
+     Write-Host "5: Press '5' to Remove A GPU-P Adapter From A VM"
          
      Write-Host "Q: Press 'Q' to quit."
  }
@@ -68,6 +69,15 @@ $ScriptToRun= $PSScriptRoot+"\PreChecks.ps1"
 
 &$ScriptToRun
  } 
+   Function RemoveGpu 
+ {
+ "Running The Script"
+$PSScriptRoot 
+
+$ScriptToRun= $PSScriptRoot+"\Remove-GPU-P.ps1"
+
+&$ScriptToRun
+ } 
 
  #Main menu loop
  do {
@@ -79,6 +89,7 @@ $ScriptToRun= $PSScriptRoot+"\PreChecks.ps1"
          '2' {ExistingVM; break}
          '3' {UpdateDrivers; break}
          '4' {PreChecks; break}
+         '5' {RemoveGpu; break}
          'q' {break} # do nothing
          default{
              Write-Host "You entered '$input'" -ForegroundColor Red
