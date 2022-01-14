@@ -1,6 +1,12 @@
 ﻿$VMName = Read-Host -Prompt 'Input your new VM Name'
 $Username = Read-Host -Prompt 'Input the user name for the new vm'
 $Password = Read-Host -Prompt 'Imput your new password'
+$GPUName = Read-Host -Prompt 'Insert the name of the gpu (ONLY WIN11), type AUTO for WIN10 or if you are not sure'
+$CPUCores = Read-Host -Prompt 'Type the number of cores for the vm'
+$MemoryAmount = Read-Host -Prompt 'Type the amount of RAM in GB, Example 8GB'
+$SizeBytes = Read-Host -Prompt 'Type the size of the vhdx in GB, Example 64GB'
+$Team_ID = Read-Host -Prompt 'Parsec team id, leave black if none'
+$Key = Read-Host -Prompt 'Parsec team key, leave blanck if none'
 
 $params = @{
     VMName = $VMName
@@ -8,16 +14,16 @@ $params = @{
     Edition    = 6
     VhdFormat  = "VHDX"
     DiskLayout = "UEFI"
-    SizeBytes  = 64GB
-    MemoryAmount = 8GB
-    CPUCores = 4
+    SizeBytes  = $SizeBytes
+    MemoryAmount = $MemoryAmount
+    CPUCores = $CPUCores
     NetworkSwitch = "Default Switch"
     VHDPath = "C:\Hyper-V\Virtual Hard Disks\OS.VHDX"
     UnattendPath = "$PSScriptRoot"+"\autounattend.xml"
-    GPUName = "AUTO"
+    GPUName = $GPUName
     GPUResourceAllocationPercentage = 50
-    Team_ID = ""
-    Key = ""
+    Team_ID = $Team_ID
+    Key = $Key
     Username = $Username
     Password = $Password
     Autologon = "true"
@@ -39,7 +45,7 @@ If ($GPUName -eq "AUTO") {
     $DevicePathName = $PartitionableGPUList.Name | Select-Object -First 1
     $GPU = Get-PnpDevice | Where-Object {($_.DeviceID -like "*$($DevicePathName.Substring(8,16))*") -and ($_.Status -eq "OK")} | Select-Object -First 1
     $GPUName = $GPU.Friendlyname
-    $GPUServiceName = $GPU.Service 
+    $GPUServiceName = $GPU.Service
     }
 Else {
     $GPU = Get-PnpDevice | Where-Object {($_.Name -eq "$GPUName") -and ($_.Status -eq "OK")} | Select-Object -First 1
@@ -53,7 +59,7 @@ $Drivers = Get-WmiObject Win32_PNPSignedDriver | where {$_.DeviceName -eq "$GPUN
 
 New-Item -ItemType Directory -Path "$DriveLetter\windows\system32\HostDriverStore" -Force | Out-Null
 
-#copy directory associated with sys file 
+#copy directory associated with sys file
 $servicePath = (Get-WmiObject Win32_SystemDriver | Where-Object {$_.Name -eq "$GPUServiceName"}).Pathname
                 $ServiceDriverDir = $servicepath.split('\')[0..5] -join('\')
                 $ServicedriverDest = ("$driveletter" + "\" + $($servicepath.split('\')[1..5] -join('\'))).Replace("DriverStore","HostDriverStore")
@@ -93,7 +99,7 @@ foreach ($d in $drivers) {
                     New-Item -ItemType Directory -Path $Destination -Force | Out-Null
                     }
                 Copy-Item $path2 -Destination $Destination -Force
-                
+
             }
 
     }
@@ -101,10 +107,10 @@ foreach ($d in $drivers) {
 
 }
 
-function Is-Administrator  
-{  
+function Is-Administrator
+{
     $CurrentUser = [Security.Principal.WindowsIdentity]::GetCurrent();
-    (New-Object Security.Principal.WindowsPrincipal $CurrentUser).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)  
+    (New-Object Security.Principal.WindowsPrincipal $CurrentUser).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 }
 
 Function SmartExit {
@@ -168,7 +174,7 @@ param(
 )
     $new = @()
 
-    $content = get-content "$PSScriptRoot\user\psscripts.ini" 
+    $content = get-content "$PSScriptRoot\user\psscripts.ini"
 
     foreach ($line in $content) {
         if ($line -like "0Parameters="){
@@ -1143,7 +1149,7 @@ You can use the fields below to configure the VHD or VHDX that you want to creat
     Process
     {
         Write-Host $header
-        
+
         $disk           = $null
         $openWim        = $null
         $openIso        = $null
@@ -4295,8 +4301,8 @@ VirtualHardDisk
 }
 "@
     #ifdef for Powershell V7 or greater which looks for assemblies in same path as powershell dll path
-    if ($PSVersionTable.psversion.Major -ge 7){        
-    Add-Type -TypeDefinition $code -ErrorAction SilentlyContinue 
+    if ($PSVersionTable.psversion.Major -ge 7){
+    Add-Type -TypeDefinition $code -ErrorAction SilentlyContinue
     }
     else {
     Add-Type -TypeDefinition $code -ReferencedAssemblies "System.Xml","System.Linq","System.Xml.Linq" -ErrorAction SilentlyContinue
@@ -4329,8 +4335,8 @@ param(
 [string]$GPUName,
 [decimal]$GPUResourceAllocationPercentage = 100
 )
-    
-    $PartitionableGPUList = Get-WmiObject -Class "Msvm_PartitionableGpu" -ComputerName $env:COMPUTERNAME -Namespace "ROOT\virtualization\v2" 
+
+    $PartitionableGPUList = Get-WmiObject -Class "Msvm_PartitionableGpu" -ComputerName $env:COMPUTERNAME -Namespace "ROOT\virtualization\v2"
     if ($GPUName -eq "AUTO") {
         $DevicePathName = $PartitionableGPUList.Name[0]
         Add-VMGpuPartitionAdapter -VMName $VMName
@@ -4371,7 +4377,7 @@ param(
 [string]$password,
 [string]$autologon
 )
-    
+
     if ($(Get-VM -Name $VMName -ErrorAction SilentlyContinue) -ne $NULL) {
         SmartExit -ExitReason "Virtual Machine already exists with name $VMName, please delete existing VM or change VMName"
         }
@@ -4379,12 +4385,12 @@ param(
         SmartExit -ExitReason "Virtual Machine Disk already exists at $vhdPath, please delete existing VHDX or change VMName"
         }
     Modify-AutoUnattend -username "$username" -password "$password" -autologon $autologon -hostname $VMName -UnattendPath $UnattendPath
-    $MaxAvailableVersion = (Get-VMHostSupportedVersion).Version | Where-Object {$_.Major -lt 254}| Select-Object -Last 1 
+    $MaxAvailableVersion = (Get-VMHostSupportedVersion).Version | Where-Object {$_.Major -lt 254}| Select-Object -Last 1
     Convert-WindowsImage -SourcePath $SourcePath -Edition $Edition -VHDFormat $Vhdformat -VHDPath $VhdPath -DiskLayout $DiskLayout -UnattendPath $UnattendPath -GPUName $GPUName -Team_ID $Team_ID -Key $Key -SizeBytes $SizeBytes| Out-Null
     if (Test-Path $vhdPath) {
         New-VM -Name $VMName -MemoryStartupBytes $MemoryAmount -VHDPath $VhdPath -Generation 2 -SwitchName $NetworkSwitch -Version $MaxAvailableVersion | Out-Null
         Set-VM -Name $VMName -ProcessorCount $CPUCores -CheckpointType Disabled -LowMemoryMappedIoSpace 3GB -HighMemoryMappedIoSpace 32GB -GuestControlledCacheTypes $true -AutomaticStopAction ShutDown
-        Set-VMMemory -VMName $VMName -DynamicMemoryEnabled $false 
+        Set-VMMemory -VMName $VMName -DynamicMemoryEnabled $false
         $CPUManufacturer = Get-CimInstance -ClassName Win32_Processor | Foreach-Object Manufacturer
         $BuildVer = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
         if (($BuildVer.CurrentBuild -lt 22000) -and ($CPUManufacturer -eq "AuthenticAMD")) {
@@ -4395,7 +4401,7 @@ param(
         Set-VMHost -ComputerName $ENV:Computername -EnableEnhancedSessionMode $false
         Set-VMVideo -VMName $VMName -HorizontalResolution 1920 -VerticalResolution 1080
         Set-VMKeyProtector -VMName $VMName -NewLocalKeyProtector
-        Enable-VMTPM -VMName $VMName 
+        Enable-VMTPM -VMName $VMName
         Add-VMDvdDrive -VMName $VMName -Path $SourcePath
         Assign-VMGPUPartitionAdapter -GPUName $GPUName -VMName $VMName -GPUResourceAllocationPercentage $GPUResourceAllocationPercentage
         Write-Host "INFO   : Starting and connecting to VM"
@@ -4413,8 +4419,8 @@ New-GPUEnabledVM @params
 
 Start-VM -Name $params.VMName
 
-SmartExit -ExitReason "If all went well the Virtual Machine will have started, 
-In a few minutes it will load the Windows desktop, 
-when it does, sign into Parsec and start installing your games.  
+SmartExit -ExitReason "If all went well the Virtual Machine will have started,
+In a few minutes it will load the Windows desktop,
+when it does, sign into Parsec and start installing your games.
 Have fun!
 Sign up to Parsec at https://parsec.app"
