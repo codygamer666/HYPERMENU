@@ -5,8 +5,8 @@ $Username = Read-Host -Prompt 'Input the user name for the new vm'
 $Password = Read-Host -Prompt 'Imput your new password'
 $GPUName = Read-Host -Prompt 'Insert the name of the gpu (ONLY WIN11), type AUTO for WIN10 or if you are not sure'
 $CPUCores = Read-Host -Prompt 'Type the number of cores for the vm'
-$MemoryAmount = Read-Host -Prompt 'Type the amount of RAM in GB, Example 8GB'
-$SizeBytes = Read-Host -Prompt 'Type the size of the vhdx in GB, Example 64GB'
+[int64]$MemoryAmount = 1GB*(read-host "Type the amount of RAM in GB, Example 8")
+[int64]$SizeBytes = 1GB*(read-host "Type the size of the vhdx in GB, Example 64")
 $Team_ID = Read-Host -Prompt 'Parsec team id, leave black if none'
 $Key = Read-Host -Prompt 'Parsec team key, leave blanck if none'
 
