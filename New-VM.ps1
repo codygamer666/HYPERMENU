@@ -115,6 +115,49 @@ function Is-Administrator
     (New-Object Security.Principal.WindowsPrincipal $CurrentUser).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 }
 
+Function Mount-ISOReliable {
+param (
+[string]$SourcePath
+)
+$VirtualDiskDrives = Get-Volume | Where-Object {$_.DriveType -eq "CD-ROM"} | select *
+Foreach ($individualDrive in $VirtualDiskDrives) {
+    Dismount-DiskImage -ImagePath $sourcePath | Out-Null
+    }
+$mountResult = Mount-DiskImage -ImagePath $SourcePath
+$delay = 0
+Do {
+    if ($delay -gt 15) {
+        Function Get-NewDriveLetter {
+            $UsedDriveLetters = ((Get-Volume).DriveLetter) -join ""
+             Do {
+                $DriveLetter = (65..90)| Get-Random | % {[char]$_}
+                }
+            Until (!$UsedDriveLetters.Contains("$DriveLetter"))
+            $DriveLetter
+            }
+        $DriveLetter = "$(Get-NewDriveLetter)" +  ":"
+        Get-WmiObject -Class Win32_volume | Where-Object {$_.Label -eq "CCCOMA_X64FRE_EN-US_DV9"} | Set-WmiInstance -Arguments @{DriveLetter="$driveletter"}
+        }
+    Start-Sleep -s 1
+    $delay++
+    }
+Until (($mountResult | Get-Volume).DriveLetter -ne $NULL)
+($mountResult | Get-Volume).DriveLetter
+}
+
+Function ConcatenateVHDPath {
+param(
+[string]$VHDPath,
+[string]$VMName
+)
+if ($VHDPath[-1] -eq '\') {
+    $VHDPath + $VMName + ".vhdx"
+    }
+Else {
+    $VHDPath + "\" +  $VMName + ".vhdx"
+    }
+}
+
 Function SmartExit {
 param (
 [switch]$NoHalt,
@@ -141,11 +184,19 @@ Function Check-Params {
 
 $ExitReason = @()
 
+$ISODriveLetter = Mount-ISOReliable -SourcePath $params.SourcePath
+
 if ((Is-Administrator) -eq $false) {
     $ExitReason += "Script not running as Administrator, please run script as Administrator."
     }
+if (!(Test-Path $params.VHDPath)) {
+    $ExitReason += "VHDPath Directory doesn't exist, please create it before running this script."
+    }
 if (!(test-path $params.SourcePath)) {
     $ExitReason += "ISO Path Invalid. Please enter a valid ISO Path in the SourcePath section of Params."
+    }
+if (!(Test-Path $("$ISODriveLetter"+":\Sources\install.wim"))) {
+    $ExitReason += "This ISO is invalid, please check readme for ISO downloading instructions."
     }
 if ($params.Username -eq $params.VMName ) {
     $ExitReason += "Username cannot be the same as VMName."
@@ -386,6 +437,12 @@ function Convert-WindowsImage {
         [ValidateNotNullOrEmpty()]
         [ValidateScript({ Test-Path $(Resolve-Path $_) })]
         $SourcePath,
+
+        [Parameter(ParameterSetName="SRC")]
+        [Alias("DriveLetter")]
+        [string]
+        [ValidateNotNullOrEmpty()]
+        [string]$ISODriveLetter,
 
         [Parameter(ParameterSetName="SRC")]
         [Alias("GPU")]
@@ -1334,12 +1391,6 @@ You can use the fields below to configure the VHD or VHDX that you want to creat
                             $txtSourcePath.Text = $isoPath = (Resolve-Path $openFileDialog1.FileName).Path
                             Write-W2VInfo "Opening ISO $(Split-Path $isoPath -Leaf)..."
 
-                            $openIso     = Mount-DiskImage -ImagePath $isoPath -StorageType ISO -PassThru
-
-                            # Refresh the DiskImage object so we can get the real information about it.  I assume this is a bug.
-                            $openIso     = Get-DiskImage -ImagePath $isoPath
-                            $driveLetter = ($openIso | Get-Volume).DriveLetter
-
                             $script:SourcePath  = "$($driveLetter):\sources\install.wim"
 
                             # Check to see if there's a WIM file we can muck about with.
@@ -1981,22 +2032,23 @@ You can use the fields below to configure the VHD or VHDX that you want to creat
                 # or about network latency.
                 if (Test-IsNetworkLocation $SourcePath)
                 {
-                    Write-W2VInfo "Copying ISO $(Split-Path $SourcePath -Leaf) to temp folder..."
-                    robocopy $(Split-Path $SourcePath -Parent) $TempDirectory $(Split-Path $SourcePath -Leaf) | Out-Null
-                    $SourcePath = "$($TempDirectory)\$(Split-Path $SourcePath -Leaf)"
-
-                    $tempSource = $SourcePath
+                    Write-W2VError "ISO Path cannot be network location"
+                    #Write-W2VInfo "Copying ISO $(Split-Path $SourcePath -Leaf) to temp folder..."
+                    #robocopy $(Split-Path $SourcePath -Parent) $TempDirectory $(Split-Path $SourcePath -Leaf) | Out-Null
+                    #$SourcePath = "$($TempDirectory)\$(Split-Path $SourcePath -Leaf)"
+                    #$tempSource = $SourcePath
                 }
 
                 $isoPath = (Resolve-Path $SourcePath).Path
 
                 Write-W2VInfo "Opening ISO $(Split-Path $isoPath -Leaf)..."
+                <#
                 $openIso     = Mount-DiskImage -ImagePath $isoPath -StorageType ISO -PassThru
                 # Refresh the DiskImage object so we can get the real information about it.  I assume this is a bug.
                 $openIso     = Get-DiskImage -ImagePath $isoPath
                 $driveLetter = ($openIso | Get-Volume).DriveLetter
-
-                $SourcePath  = "$($driveLetter):\sources\install.wim"
+                #>
+                $SourcePath  = "$($DriveLetter):\sources\install.wim"
 
                 # Check to see if there's a WIM file we can muck about with.
                 Write-W2VInfo "Looking for $($SourcePath)..."
@@ -4363,7 +4415,7 @@ param(
 [int64]$SizeBytes,
 [int]$Edition,
 [string]$VhdFormat,
-[string]$VhdPath = "C:\Hyper-V\Virtual Hard Disks\$($VMName).vhdx",
+[string]$VhdPath,
 [string]$VMName,
 [string]$DiskLayout,
 [string]$UnattendPath,
@@ -4379,6 +4431,8 @@ param(
 [string]$password,
 [string]$autologon
 )
+    $VHDPath = ConcatenateVHDPath -VHDPath $VHDPath -VMName $VMName
+    $DriveLetter = Mount-ISOReliable -SourcePath $SourcePath
 
     if ($(Get-VM -Name $VMName -ErrorAction SilentlyContinue) -ne $NULL) {
         SmartExit -ExitReason "Virtual Machine already exists with name $VMName, please delete existing VM or change VMName"
@@ -4388,7 +4442,7 @@ param(
         }
     Modify-AutoUnattend -username "$username" -password "$password" -autologon $autologon -hostname $VMName -UnattendPath $UnattendPath
     $MaxAvailableVersion = (Get-VMHostSupportedVersion).Version | Where-Object {$_.Major -lt 254}| Select-Object -Last 1
-    Convert-WindowsImage -SourcePath $SourcePath -Edition $Edition -VHDFormat $Vhdformat -VHDPath $VhdPath -DiskLayout $DiskLayout -UnattendPath $UnattendPath -GPUName $GPUName -Team_ID $Team_ID -Key $Key -SizeBytes $SizeBytes| Out-Null
+    Convert-WindowsImage -SourcePath $SourcePath -ISODriveLetter $DriveLetter -Edition $Edition -VHDFormat $Vhdformat -VHDPath $VhdPath -DiskLayout $DiskLayout -UnattendPath $UnattendPath -GPUName $GPUName -Team_ID $Team_ID -Key $Key -SizeBytes $SizeBytes| Out-Null
     if (Test-Path $vhdPath) {
         New-VM -Name $VMName -MemoryStartupBytes $MemoryAmount -VHDPath $VhdPath -Generation 2 -SwitchName $NetworkSwitch -Version $MaxAvailableVersion | Out-Null
         Set-VM -Name $VMName -ProcessorCount $CPUCores -CheckpointType Disabled -LowMemoryMappedIoSpace 3GB -HighMemoryMappedIoSpace 32GB -GuestControlledCacheTypes $true -AutomaticStopAction ShutDown
@@ -4423,6 +4477,7 @@ Start-VM -Name $params.VMName
 
 SmartExit -ExitReason "If all went well the Virtual Machine will have started,
 In a few minutes it will load the Windows desktop,
-when it does, sign into Parsec and start installing your games.
+when it does, sign into Parsec (a fast remote desktop app)
+and connect to the machine using Parsec from another computer.
 Have fun!
 Sign up to Parsec at https://parsec.app"
