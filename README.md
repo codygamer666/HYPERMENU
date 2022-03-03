@@ -1,3 +1,7 @@
+# UPDATE!
+A new version is finally coming, I'm currently developing a new menu for hyper-v in general that will replace this menu...
+Stay tuned and thank you for your support!
+
 # Easy-GPU-P with an integrated menu!
 Fork Of The Original Easy-GPU-PV, With a menu!
 
