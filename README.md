@@ -25,4 +25,4 @@ For GPU-P You can find the original source at: https://github.com/jamesstringerp
 All Credits to @jamesstringerparsec
 
 
-![beta1](https://user-images.githubusercontent.com/96527590/149619581-df924e1a-b753-477c-a17d-76af0ff2318c.JPG)
+![HYPER1](https://user-images.githubusercontent.com/96527590/159837753-81b3b949-ac73-436e-8190-09d57cf76e4f.jpg)
