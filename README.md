@@ -1,3 +1,7 @@
+# UPDATE, GREAT NEWS!!!!
+In the next few hours i will upload a new menu with more features and it even comes with an installer!
+Stay tuned and don't miss the chance to try it out!
+
 # UPDATE!
 A new version is finally coming, I'm currently developing a new menu for hyper-v in general that will replace this menu...
 Stay tuned and thank you for your support!
