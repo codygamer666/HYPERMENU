@@ -1,10 +1,13 @@
-# Easy-GPU-P with an integrated menu!
-Fork Of The Original Easy-GPU-PV, With a menu!
+# UPDATE!
+EASY-GPUP-MENU is now HYPEMENU with more features, more stability and even an installer for more semplicity!
+
+# HYPERMENU, the only!
+A simple menu for those that need a simple and quick access to Hyper-V CLI settings.
 
 ## Guide:
-1. Download the menu from this link: https://github.com/codygamer666/EASY-GPU-P-MENU/releases 
+1. Download the menu from this link: https://github.com/codygamer666/HYPERMENU/releases 
 2. Drop the Win10/11 ISO in the iso folder and rename it WIN.iso
-3. Run menu.ps1 and follow the options
+3. Run HYPERMENU and follow the options
 
 ## Features:
 1. Creates a new vm with gpu-p, drivers and parsec using hyper-v
@@ -13,9 +16,13 @@ Fork Of The Original Easy-GPU-PV, With a menu!
 4. Run the PreChecks script
 5. Remove gpu-p adapter from vm
 6. Print A List Of Available GPUS In Your System (Even On Laptops Yea)
+7. Add/Remove Nested Hyper-V
+8. DDA Device Print
+And more to come!!
 
-You can find the original Repo at: https://github.com/jamesstringerparsec/Easy-GPU-PV
+For GPU-P You can find the original source at: https://github.com/jamesstringerparsec/Easy-GPU-PV
 
 All Credits to @jamesstringerparsec
 
-![alpha2](https://user-images.githubusercontent.com/96527590/149499777-2008a4c7-e914-41f4-b536-03f1520c1c93.JPG)
+
+![beta1](https://user-images.githubusercontent.com/96527590/149619581-df924e1a-b753-477c-a17d-76af0ff2318c.JPG)
