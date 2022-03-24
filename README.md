@@ -1,10 +1,5 @@
-# UPDATE, GREAT NEWS!!!!
-In the next few hours i will upload a new menu with more features and it even comes with an installer!
-Stay tuned and don't miss the chance to try it out!
-
 # UPDATE!
-A new version is finally coming, I'm currently developing a new menu for hyper-v in general that will replace this menu...
-Stay tuned and thank you for your support!
+EASY-GPUP-MENU is now HYPEMENU with more features, more stability and even an installer for more semplicity!
 
 # HYPERMENU, the only!
 A simple menu for those that need a simple and quick access to Hyper-V CLI settings.
