@@ -20,4 +20,5 @@ You can find the original Repo at: https://github.com/jamesstringerparsec/Easy-G
 
 All Credits to @jamesstringerparsec
 
-![alpha2](https://user-images.githubusercontent.com/96527590/149499777-2008a4c7-e914-41f4-b536-03f1520c1c93.JPG)
+
+![HYPER2](https://user-images.githubusercontent.com/96527590/161138872-a7458bc3-2f4b-4b69-96dd-26b4e9be9c64.jpg)
