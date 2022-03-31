@@ -64,15 +64,17 @@ $host.UI.RawUI.BackgroundColor = "Black"
      )
      Clear-Host
      Write-Host "============================================ HYPERMENU ============================================" -ForegroundColor Green
-     Write-Host "A: Create A New VM" -ForegroundColor Yellow
+     Write-Host "A: Create A New VM With GPU-P (10 21H2 Or 11)" -ForegroundColor Yellow
      Write-Host "B: Add GPU-P To A VM" -ForegroundColor Yellow
      Write-Host "C: Update GPU-P Drivers" -ForegroundColor Yellow
      Write-Host "D: Run The GPU-P PreChecks" -ForegroundColor Yellow
      Write-Host "E: Remove A GPU-P Adapter From A VM" -ForegroundColor Yellow
-     Write-Host "F: Print A List Of Available GPUS In Your System" -ForegroundColor Yellow
+     Write-Host "F: Print A List Of Available GPUS For GPU-P In Your System" -ForegroundColor Yellow
      Write-Host "G: Enable Nested Virtualization" -ForegroundColor Yellow
      Write-Host "H: Disable Nested Virtualization" -ForegroundColor Yellow
      Write-Host "I: Run DDA Device Checks" -ForegroundColor Yellow
+     Write-Host "J: Add Vlans To A Nested VM" -ForegroundColor Yellow
+     Write-Host "K: Removes Vlans Assigned Ao A Nested VM" -ForegroundColor Yellow
 
      Write-Host "Q: Press 'Q' to quit." -ForegroundColor Red
  }
@@ -219,7 +221,7 @@ Do {
         $DriveLetter = "$(Get-NewDriveLetter)" +  ":"
         Get-WmiObject -Class Win32_volume | Where-Object {$_.Label -eq "CCCOMA_X64FRE_EN-US_DV9"} | Set-WmiInstance -Arguments @{DriveLetter="$driveletter"}
         }
-    Start-Sleep -s 1 
+    Start-Sleep -s 1
     $delay++
     }
 Until (($mountResult | Get-Volume).DriveLetter -ne $NULL)
@@ -1241,7 +1243,7 @@ You can use the fields below to configure the VHD or VHDX that you want to creat
         diskpart -automount
 
         Write-Host $header
-        
+
         $disk           = $null
         $openWim        = $null
         $openIso        = $null
@@ -4640,8 +4642,8 @@ function Assign-VMGPUPartitionAdapter {
 param(
 [decimal]$GPUResourceAllocationPercentage = 100
 )
-    
-    $PartitionableGPUList = Get-WmiObject -Class "Msvm_PartitionableGpu" -ComputerName $env:COMPUTERNAME -Namespace "ROOT\virtualization\v2" 
+
+    $PartitionableGPUList = Get-WmiObject -Class "Msvm_PartitionableGpu" -ComputerName $env:COMPUTERNAME -Namespace "ROOT\virtualization\v2"
     if ($GPUName -eq "AUTO") {
         $DevicePathName = $PartitionableGPUList.Name[0]
         Add-VMGpuPartitionAdapter -VMName $VMName
@@ -5050,8 +5052,9 @@ $PSScriptRoot
 Write-Host 'This script adds Nested Hyper-V to a vm' -ForegroundColor Green
 $VMName = Read-Host -Prompt 'Input your new VM Name'
 Set-VMProcessor -Vmname $VMName -ExposeVirtualizationExtensions $true
+pause
 
-$ScriptToRun
+&$ScriptToRun
 }
 
 Function NestedHV-Del
@@ -5060,11 +5063,44 @@ Function NestedHV-Del
 
 $PSScriptRoot
 Write-Host 'This script removes Nested Hyper-V from a vm' -ForegroundColor Red
-$VMName = Read-Host -Prompt 'Input your new VM Name'
+$VMName = Read-Host -Prompt 'Input your VM Name'
 Set-VMProcessor -Vmname $VMName -ExposeVirtualizationExtensions $false
+pause
 
+&$ScriptToRun
 }
 
+Function GuestVlan
+{
+"Running The Script"
+
+$PSScriptRoot
+Write-Host 'This script adds user selected Vlans to a VM' -ForegroundColor Green
+$VMName = Read-Host -Prompt 'Input your VM Name'
+$VlanList = Read-Host -Prompt 'Input the disired tagget Vlans (if multiple, comma sparated)'
+$NativeVlan = Read-Host -Prompt 'Input the disired native Vlan (Untagged)'
+
+Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
+Set-VMNetworkAdapterVlan -Trunk -AllowedVlanIdList $VlanList -VMName $VMName -NativeVlanId $NativeVlan
+Get-VMNetworkAdapterVlan -VMName $VMName | Out-Host
+pause
+
+&$ScriptToRun
+}
+
+Function VlanRemove
+{
+"Running The Script"
+
+$PSScriptRoot
+Write-Host 'This script removes user selected Vlans assigned to a VM' -ForegroundColor Red
+$VMName = Read-Host -Prompt 'Input your new VM Name'
+
+Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing Off
+Set-VMNetworkAdapterVlan -Untagged -VMName $VMName
+Get-VMNetworkAdapterVlan -VMName $VMName | Out-Host
+pause
+}
 
 
  #Main menu loop
@@ -5082,6 +5118,8 @@ Set-VMProcessor -Vmname $VMName -ExposeVirtualizationExtensions $false
          'g' {NestedHV; break}
          'h' {NestedHV-Del; break}
          'i' {DDAList; break}
+         'j' {GuestVlan; break}
+         'k' {VlanRemove; break}
          'q' {break} # do nothing
          default{
              Write-Host "You entered '$input'" -ForegroundColor Red
