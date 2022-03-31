@@ -5050,7 +5050,7 @@ Function NestedHV
 
 $PSScriptRoot
 Write-Host 'This script adds Nested Hyper-V to a vm' -ForegroundColor Green
-$VMName = Read-Host -Prompt 'Input your new VM Name'
+$VMName = Read-Host -Prompt 'Input your VM Name'
 Set-VMProcessor -Vmname $VMName -ExposeVirtualizationExtensions $true
 pause
 
@@ -5063,7 +5063,7 @@ Function NestedHV-Del
 
 $PSScriptRoot
 Write-Host 'This script removes Nested Hyper-V from a vm' -ForegroundColor Red
-$VMName = Read-Host -Prompt 'Input your VM Name'
+$VMName = Read-Host -Prompt 'Input VM Name'
 Set-VMProcessor -Vmname $VMName -ExposeVirtualizationExtensions $false
 pause
 
@@ -5077,8 +5077,8 @@ Function GuestVlan
 $PSScriptRoot
 Write-Host 'This script adds user selected Vlans to a VM' -ForegroundColor Green
 $VMName = Read-Host -Prompt 'Input your VM Name'
-$VlanList = Read-Host -Prompt 'Input the disired tagget Vlans (if multiple, comma sparated)'
-$NativeVlan = Read-Host -Prompt 'Input the disired native Vlan (Untagged)'
+$VlanList = Read-Host -Prompt 'Input the desired tagget Vlans (if multiple, comma sparated)'
+$NativeVlan = Read-Host -Prompt 'Input the desired native Vlan (Untagged)'
 
 Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
 Set-VMNetworkAdapterVlan -Trunk -AllowedVlanIdList $VlanList -VMName $VMName -NativeVlanId $NativeVlan
@@ -5094,7 +5094,7 @@ Function VlanRemove
 
 $PSScriptRoot
 Write-Host 'This script removes user selected Vlans assigned to a VM' -ForegroundColor Red
-$VMName = Read-Host -Prompt 'Input your new VM Name'
+$VMName = Read-Host -Prompt 'Input your VM Name'
 
 Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing Off
 Set-VMNetworkAdapterVlan -Untagged -VMName $VMName
